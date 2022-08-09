@@ -5,9 +5,10 @@ import com.godcoder.myhome.repositories.BoardRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @Controller
@@ -25,4 +26,28 @@ public class BoardController
         return "board/list";
     }
 
+    @GetMapping("/form")
+    public String form(Model model, @RequestParam(required = false) Long id)
+    {
+        if(id == null) // 새로운 아이디
+        {
+            model.addAttribute("board", new Board());
+        }
+        else // 이미 존재하는 아이디
+        {
+            Board board = boardRepository.findById(id).orElse(null);
+            model.addAttribute("board", board);
+        }
+
+        return "board/form";
+    }
+
+    @PostMapping("/form")
+    public String greetingSubmit(@Valid Board board, BindingResult bindingResult) // 커맨드 객체
+    {
+        if(bindingResult.hasErrors()) return "board/form";
+
+        boardRepository.save(board);
+        return "redirect:/board/list";
+    }
 }
