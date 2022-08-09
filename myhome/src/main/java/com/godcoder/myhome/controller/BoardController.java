@@ -2,6 +2,8 @@ package com.godcoder.myhome.controller;
 
 import com.godcoder.myhome.model.Board;
 import com.godcoder.myhome.repositories.BoardRepository;
+import com.godcoder.myhome.validator.BoardValidator;
+import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,6 +19,8 @@ public class BoardController
 {
     @Autowired // auto injection
     private BoardRepository boardRepository;
+    @Autowired
+    private BoardValidator boardValidator;
 
     @GetMapping("/list")
     public String list(Model model)
@@ -45,6 +49,7 @@ public class BoardController
     @PostMapping("/form")
     public String greetingSubmit(@Valid Board board, BindingResult bindingResult) // 커맨드 객체
     {
+        boardValidator.validate(board, bindingResult);
         if(bindingResult.hasErrors()) return "board/form";
 
         boardRepository.save(board);
